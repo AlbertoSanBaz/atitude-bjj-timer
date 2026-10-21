@@ -134,27 +134,39 @@ adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/release/app-relea
 
 ## Estado y pendientes
 
-- ✅ PWA funcionando sin conexión y probada en navegador (escritorio, móvil y modo TV).
-- ✅ **El proyecto Android compila** (debug y release) y `lintDebug` pasa sin errores.
-- ✅ **Probado en emulador** Google TV Android 12 (API 31, WebView 91, 1080p → viewport 960×540): puente, `html.native.tv`, mando (flechas/OK), ▶❚❚ ⏭ ⏮ sin dobles disparos, Atrás (pausa → ajustes → salir), `FLAG_KEEP_SCREEN_ON` y audio (AAudio, `USAGE_MEDIA`: en la tele manda el volumen multimedia).
-  - AVD `AtitudeTV_API31`: `~/Library/Android/sdk/emulator/emulator -avd AtitudeTV_API31`
-  - Si se recrea con `avdmanager`, poner `hw.keyboard=yes` en `~/.android/avd/<nombre>.avd/config.ini`: por defecto queda en `no` y ni el teclado del Mac ni el mando virtual del emulador responden (`adb shell input` sí funciona, así que no lo detecta).
-- ✅ **Release v1.0.0** en GitHub con `AtitudeTimer-1.0.0.apk` (etiqueta `v1.0.0`). Siguientes versiones: subir `versionCode`/`versionName`, nueva etiqueta y release con el APK renombrado `AtitudeTimer-x.y.z.apk`.
-  - Inspeccionar la WebView (solo APK debug): `adb forward tcp:9222 localabstract:webview_devtools_remote_$(adb shell pidof com.atitudebjj.timer)` y abrir `chrome://inspect`.
-  - Entorno del Mac (sin Android Studio): OpenJDK 21 de Homebrew (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`), `brew --cask android-commandlinetools` y SDK en `~/Library/Android/sdk` (platform-tools, platforms;android-36, build-tools 35 y 36). `android-tv/local.properties` apunta ahí (no se sube).
-  - Release: R8 conserva los métodos del puente con `@JavascriptInterface` (comprobado con dexdump). Firmado con la clave debug.
-  - `dispatchKeyEvent` lleva `@SuppressLint("RestrictedApi")`: falso positivo de androidx.core. No cambiarlo a `onKeyDown`, o las teclas multimedia llegarían también al keydown de la web y se ejecutarían dos veces.
-  - Versiones: AGP 8.13.0, Kotlin 2.2.20, Gradle 8.14.3, compileSdk/targetSdk 36, minSdk 24, androidx core-ktx 1.15.0, activity-ktx 1.9.3, webkit 1.12.1. Lint avisa de versiones nuevas (AGP 9 es un salto mayor: integra Kotlin y cambia el DSL).
-- ⏳ **Probar en la TV real del gimnasio:**
-  - Versión del WebView.
-  - Volumen de campana y claqueta.
-  - Navegación con el mando.
-  - Teclas multimedia.
-  - Que la pantalla no se apague.
-- ✅ Repositorio público: https://github.com/AlbertoSanBaz/atitude-bjj-timer (rama `main`).
-- ✅ PWA publicada en GitHub Pages: https://albertosanbaz.github.io/atitude-bjj-timer/
+### Hecho
+
+- ✅ **PWA** funcionando sin conexión y probada en navegador (escritorio, móvil y modo TV): 44 pruebas Playwright.
+- ✅ **Repositorio público:** https://github.com/AlbertoSanBaz/atitude-bjj-timer (rama `main`).
+- ✅ **PWA publicada en GitHub Pages:** https://albertosanbaz.github.io/atitude-bjj-timer/
   - `.github/workflows/pages.yml` despliega `web/` en cada push a `main` que toque `web/`.
   - Se sirve en un subdirectorio: **todas las rutas deben ser relativas** (nada de `/css/...`).
-- ⏳ Conseguir el logo original en alta resolución → `branding/logo.png` → `tools/generate_assets.py`.
-- ⏳ Si se publica en Google Play: firma propia (ahora el release usa la clave debug), App Bundle y checklist de calidad de TV.
+- ✅ **El proyecto Android compila** (debug y release) y `lintDebug` pasa sin errores.
+- ✅ **Probado en emulador** Google TV Android 12 (API 31, WebView 91, 1080p → viewport 960×540): puente, `html.native.tv`, mando (flechas/OK), ▶❚❚ ⏭ ⏮ sin dobles disparos, Atrás (pausa → ajustes → salir), `FLAG_KEEP_SCREEN_ON` y audio.
+- ✅ **Release v1.0.0** en GitHub con `AtitudeTimer-1.0.0.apk` (etiqueta `v1.0.0`): https://github.com/AlbertoSanBaz/atitude-bjj-timer/releases/tag/v1.0.0
+
+### Pendiente
+
+1. ⏳ **Probar en la TV real del gimnasio** (siguiente paso). El usuario lo instalará con un pendrive (`AtitudeTimer-1.0.0.apk`) y un explorador de archivos. Revisar:
+   - Versión del WebView (mínimo Chromium 87).
+   - Volumen de campana y claqueta. El audio sale como `USAGE_MEDIA`: manda el **volumen multimedia** de la tele.
+   - Navegación con el mando real.
+   - Teclas multimedia (▶❚❚ ⏭ ⏮) y Atrás.
+   - Que la pantalla no se apague durante la sesión.
+2. ⏳ Conseguir el **logo original en alta resolución** → `branding/logo.png` → `python3 tools/generate_assets.py`.
+3. ⏳ Menores de Lint, sin urgencia:
+   - Icono monocromo (`<monochrome>`) en `mipmap-anydpi-v26` para los iconos temáticos de Android 13+ en móviles.
+   - Actualizar dependencias. AGP 9 es un salto mayor: integra Kotlin y cambia el DSL, así que conviene hacerlo aparte.
+4. ⏳ **Google Play** (opcional): firma propia (ahora el release usa la clave debug), App Bundle (`./gradlew bundleRelease`) y checklist de calidad de TV. Al cambiar de firma, hay que desinstalar la versión anterior en la tele.
+
+### Notas técnicas
+
+- **Publicar una versión nueva de Android:** subir `versionCode`/`versionName` en `android-tv/app/build.gradle.kts`, compilar `assembleRelease`, crear la etiqueta `vX.Y.Z` y una release con el APK renombrado `AtitudeTimer-X.Y.Z.apk`. Tras crearla, la URL pública de descarga tarda unos segundos en responder (da 404 al principio).
+- **Entorno del Mac** (sin Android Studio): OpenJDK 21 de Homebrew (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`), `brew --cask android-commandlinetools` y SDK en `~/Library/Android/sdk` (platform-tools, platforms;android-36, build-tools 35 y 36, emulator, cmdline-tools;latest). `android-tv/local.properties` apunta ahí (no se sube).
+- **Emulador:** AVD `AtitudeTV_API31` → `~/Library/Android/sdk/emulator/emulator -avd AtitudeTV_API31`.
+  - Si se recrea con `avdmanager` (el de `~/Library/Android/sdk/cmdline-tools/latest/bin`, el de Homebrew no encuentra la SDK), poner `hw.keyboard=yes` en `~/.android/avd/<nombre>.avd/config.ini`. Por defecto queda en `no` y ni el teclado del Mac ni el mando virtual responden. `adb shell input` sí funciona, así que las pruebas por adb no lo detectan.
+- **Inspeccionar la WebView** (solo APK debug): `adb forward tcp:9222 localabstract:webview_devtools_remote_$(adb shell pidof com.atitudebjj.timer)` y abrir `chrome://inspect`.
+- **R8:** el release conserva los métodos del puente con `@JavascriptInterface` (comprobado con dexdump).
+- **`dispatchKeyEvent`** lleva `@SuppressLint("RestrictedApi")`: falso positivo de androidx.core. No cambiarlo a `onKeyDown`, o las teclas multimedia llegarían también al keydown de la web y se ejecutarían dos veces.
+- **Versiones:** AGP 8.13.0, Kotlin 2.2.20, Gradle 8.14.3, compileSdk/targetSdk 36, minSdk 24, androidx core-ktx 1.15.0, activity-ktx 1.9.3, webkit 1.12.1.
 - **Artefacto antiguo:** existe una versión anterior publicada como artefacto en claude.ai («Atitude BJJ Timer»). **No está sincronizada** con `web/`: la fuente de verdad es este repositorio.
