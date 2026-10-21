@@ -1,0 +1,18 @@
+# Android / Gradle
+android-tv/.gradle/
+android-tv/build/
+android-tv/app/build/
+android-tv/local.properties
+android-tv/.idea/
+android-tv/*.iml
+android-tv/app/*.iml
+android-tv/captures/
+*.keystore
+*.jks
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/

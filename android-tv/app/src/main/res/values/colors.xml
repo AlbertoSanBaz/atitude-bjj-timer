@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mismos colores que web/css/app.css -->
+    <color name="ink">#FF0D0B0B</color>
+    <color name="red">#FFDC2A31</color>
+    <color name="ic_launcher_background">#FF0D0B0B</color>
+</resources>

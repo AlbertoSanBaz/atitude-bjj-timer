@@ -1,0 +1,70 @@
+/* Modo TV (Android TV / 10-foot UI).
+   Se activa con la clase html.tv (la pone js/platform.js dentro de la app nativa o con ?tv=1).
+   - Margen de seguridad para overscan (~5 %).
+   - Foco muy visible a 3 m: se navega con las flechas del mando.
+   - Layout del timer pensado para 16:9: ronda a la izquierda, reloj enorme a la derecha. */
+
+html.tv { --overscan-x: 5vw; --overscan-y: 5vh; }
+
+/* ---------- foco visible ---------- */
+html.tv :focus { outline: none; }
+html.tv :focus-visible,
+html.tv .tv-focus {
+  outline: 4px solid var(--gold);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 10px rgba(243, 195, 49, .18);
+}
+html.tv .chip:focus-visible { transform: scale(1.05); }
+html.tv .btn-start:focus-visible { transform: scale(1.02); }
+html.tv .step:focus-visible { background: var(--red); border-color: var(--red); }
+html.tv .ctl:focus-visible { outline-offset: 8px; border-radius: 16px; }
+html.tv .ctl-main:focus-visible { border-radius: 50%; }
+html.tv .toggle:focus-within { outline: 4px solid var(--gold); outline-offset: 4px; }
+html.tv .toggle input:focus-visible + .track { outline: none; }
+.chip, .btn-start, .step { transition: transform .12s ease, background .15s, border-color .15s; }
+
+/* ---------- configuración ---------- */
+html.tv .setup {
+  padding-left: var(--overscan-x);
+  padding-right: var(--overscan-x);
+  padding-bottom: var(--overscan-y);
+}
+html.tv .brand { padding-top: var(--overscan-y); }
+html.tv .setup-inner { padding-top: 16px; gap: 18px; max-width: none; }
+html.tv .brand, html.tv .foot { max-width: none; }
+html.tv .setup-title { font-size: clamp(40px, 7vw, 72px); }
+/* con el mando no se escribe: los campos numéricos solo muestran el valor */
+html.tv .num { pointer-events: none; }
+html.tv .hint-keys { display: none; }
+html.tv .hint-tv { display: block; }
+html.tv .foot .ext { display: none; }
+html.tv .toast { display: none !important; }
+
+/* ---------- timer ---------- */
+html.tv .run {
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  column-gap: 4vw;
+  padding: var(--overscan-y) var(--overscan-x);
+}
+html.tv .run-top { grid-column: 1 / -1; }
+html.tv .run-round {
+  grid-column: 1; grid-row: 2;
+  flex-direction: column; justify-content: center; align-items: flex-start; gap: 8px;
+}
+html.tv .round-main { flex-wrap: wrap; }
+html.tv .round-num { font-size: clamp(64px, 18vh, 200px); }
+html.tv .run-center { grid-column: 2; grid-row: 2; }
+html.tv .clock { font-size: min(30vw, 48vh); }
+html.tv .run-meta { grid-column: 1 / -1; grid-row: 3; }
+html.tv .run-controls { grid-column: 1 / -1; grid-row: 4; padding-top: 6px; }
+html.tv .ctl-main { width: 72px; height: 72px; }
+html.tv #btn-fs { display: none; }   /* la app nativa ya es pantalla completa */
+
+/* en la app nativa (TV o móvil) no hay botón de pantalla completa */
+html.native #btn-fs { display: none; }
+html.native .toast { display: none !important; }
+
+/* sobre los colores de fase (amarillo, verde, rojo) el foco usa el color del texto */
+html.tv .run :focus-visible { outline-color: var(--fg); box-shadow: 0 0 0 10px var(--fg-track); }
+html.tv .done :focus-visible { outline-color: var(--gold); }

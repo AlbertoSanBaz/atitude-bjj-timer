@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atitude BJJ Timer</title>
+<meta name="description" content="Timer de rounds de Atitude BJJ Málaga">
+<meta name="theme-color" content="#0d0b0b">
+<meta name="color-scheme" content="dark">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Atitude Timer">
+
+<!-- Todo local: funciona sin conexión -->
+<link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/tv.css">
+</head>
+<body>
+
+<!-- ============ CONFIGURACIÓN ============ -->
+<main id="setup" class="setup">
+  <div class="setup-hero" aria-hidden="true"></div>
+
+  <header class="brand">
+    <img class="brand-logo" src="img/logo.webp" alt="Escudo de Atitude BJJ Málaga" width="64" height="64">
+    <div class="brand-text">
+      <span class="brand-name">Atitude <em>BJJ</em></span>
+      <span class="brand-sub">Málaga · Cláudio Peteleco</span>
+    </div>
+  </header>
+
+  <div class="setup-inner">
+    <h1 class="setup-title">Timer de rounds</h1>
+
+    <section class="block" aria-labelledby="h-presets">
+      <h2 id="h-presets" class="label">Entreno</h2>
+      <div class="chips" id="presets-training"></div>
+      <h2 class="label">Competición IBJJF · adulto</h2>
+      <div class="chips" id="presets-belts"></div>
+    </section>
+
+    <section class="block grid-config" aria-label="Configuración">
+      <div class="field" id="f-round">
+        <h2 class="label"><span class="dot dot-fight"></span>Round</h2>
+        <div class="time-input">
+          <button class="step" data-target="round" data-delta="-60" aria-label="Restar un minuto al round">−</button>
+          <label class="sr" for="round-min">Minutos de round</label>
+          <input id="round-min" class="num" type="number" inputmode="numeric" min="0" max="30" value="5">
+          <span class="colon">:</span>
+          <label class="sr" for="round-sec">Segundos de round</label>
+          <input id="round-sec" class="num" type="number" inputmode="numeric" min="0" max="59" step="5" value="00">
+          <button class="step" data-target="round" data-delta="60" aria-label="Sumar un minuto al round">+</button>
+        </div>
+        <div class="fine">
+          <button class="fine-btn" data-target="round" data-delta="-15">−15 s</button>
+          <button class="fine-btn" data-target="round" data-delta="15">+15 s</button>
+        </div>
+      </div>
+
+      <div class="field" id="f-rest">
+        <h2 class="label"><span class="dot dot-rest"></span>Descanso</h2>
+        <div class="time-input">
+          <button class="step" data-target="rest" data-delta="-60" aria-label="Restar un minuto al descanso">−</button>
+          <label class="sr" for="rest-min">Minutos de descanso</label>
+          <input id="rest-min" class="num" type="number" inputmode="numeric" min="0" max="30" value="1">
+          <span class="colon">:</span>
+          <label class="sr" for="rest-sec">Segundos de descanso</label>
+          <input id="rest-sec" class="num" type="number" inputmode="numeric" min="0" max="59" step="5" value="00">
+          <button class="step" data-target="rest" data-delta="60" aria-label="Sumar un minuto al descanso">+</button>
+        </div>
+        <div class="fine">
+          <button class="fine-btn" data-target="rest" data-delta="-15">−15 s</button>
+          <button class="fine-btn" data-target="rest" data-delta="15">+15 s</button>
+        </div>
+      </div>
+
+      <div class="field" id="f-rounds">
+        <h2 class="label">Nº de rounds</h2>
+        <div class="time-input">
+          <button class="step" id="rounds-dec" aria-label="Un round menos">−</button>
+          <label class="sr" for="rounds">Número de rounds (0 = sin límite)</label>
+          <output id="rounds" class="num num-wide" aria-live="polite">8</output>
+          <button class="step" id="rounds-inc" aria-label="Un round más">+</button>
+        </div>
+        <div class="fine">
+          <button class="fine-btn" id="rounds-inf">Sin límite ∞</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="block toggles" aria-label="Opciones">
+      <label class="toggle"><input type="checkbox" id="opt-prep" checked><span class="track"></span><span><b>Preparación</b> 10 s antes del primer round</span></label>
+      <label class="toggle"><input type="checkbox" id="opt-warn" checked><span class="track"></span><span><b>Aviso final</b> claqueta a 10 s del final</span></label>
+      <label class="toggle"><input type="checkbox" id="opt-sound" checked><span class="track"></span><span><b>Sonido</b> campana, claqueta y pitidos</span></label>
+    </section>
+
+    <section class="summary" aria-live="polite">
+      <p id="summary-line" class="summary-line">8 rounds × 5:00 · descanso 1:00</p>
+      <p id="summary-total" class="summary-total">Sesión de 47:00</p>
+    </section>
+
+    <button id="start" class="btn-start">Empezar</button>
+    <p class="hint hint-keys">Atajos: <kbd>Espacio</kbd> pausa · <kbd>N</kbd> saltar · <kbd>R</kbd> reiniciar · <kbd>F</kbd> pantalla completa</p>
+    <p class="hint hint-tv">Mando: <kbd>OK</kbd> pulsar · <kbd>▶❚❚</kbd> pausa · <kbd>⏭</kbd> saltar · <kbd>Atrás</kbd> volver a ajustes</p>
+  </div>
+
+  <footer class="foot">
+    <span>Atitude BJJ · C. Brasilia, 25 · Cruz de Humilladero, Málaga</span>
+    <a class="ext" href="https://www.atitudebjj.com/" target="_blank" rel="noopener">atitudebjj.com</a>
+    <a class="ext" href="https://www.instagram.com/claudiopeteleco/" target="_blank" rel="noopener">@claudiopeteleco</a>
+  </footer>
+</main>
+
+<!-- ============ TIMER ============ -->
+<section id="run" class="run" data-phase="prep" hidden aria-label="Timer en marcha">
+  <img class="run-mark" src="img/logo.webp" alt="" aria-hidden="true">
+
+  <div class="run-top">
+    <div class="run-brand">
+      <img src="img/logo.webp" alt="" width="40" height="40">
+      <span>Atitude <em>BJJ</em></span>
+    </div>
+    <div class="run-tools">
+      <button class="icon-btn" id="btn-sound" aria-label="Silenciar" aria-pressed="false" title="Sonido (M)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="mute" d="M16 9l6 6M22 9l-6 6"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-fs" aria-label="Pantalla completa" title="Pantalla completa (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-exit" aria-label="Volver a ajustes" title="Ajustes">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="run-round">
+    <div class="round-main">
+      <span class="round-word" id="round-word">Round</span>
+      <span class="round-num" id="round-num">1</span>
+      <span class="round-of" id="round-of">/ 8</span>
+    </div>
+    <div class="round-done"><span id="done-count">0</span> completados</div>
+  </div>
+
+  <div class="run-center">
+    <div class="phase" id="phase-label">Prepárate</div>
+    <div class="clock" id="clock" role="timer" aria-live="off">0:10</div>
+    <div class="bar" aria-hidden="true"><span id="bar-fill"></span></div>
+  </div>
+
+  <div class="run-meta">
+    <div><span class="k">Siguiente</span><span class="v" id="meta-next">Round 1 · 5:00</span></div>
+    <div><span class="k">En el tatami</span><span class="v" id="meta-elapsed">0:00</span></div>
+    <div><span class="k">Termina</span><span class="v" id="meta-end">—</span></div>
+  </div>
+
+  <div class="run-controls">
+    <button class="ctl" id="btn-reset" title="Reiniciar sesión (R)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>
+      <span>Reiniciar</span>
+    </button>
+    <button class="ctl ctl-main" id="btn-play" title="Pausa / continuar (Espacio)" aria-label="Pausar">
+      <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+      <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>
+    </button>
+    <button class="ctl" id="btn-skip" title="Saltar fase (N)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l9 7-9 7zM18 5v14"/></svg>
+      <span>Saltar</span>
+    </button>
+  </div>
+
+  <div id="paused-tag" class="paused-tag" hidden>En pausa</div>
+
+  <div id="done" class="done" hidden>
+    <div class="done-inner">
+      <p class="done-kicker">Sesión completada</p>
+      <p class="done-oss">Oss</p>
+      <p class="done-stats" id="done-stats">8 rounds · 47:00 en el tatami</p>
+      <div class="done-actions">
+        <button class="btn-start" id="btn-again">Repetir</button>
+        <button class="btn-ghost" id="btn-settings">Ajustes</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="toast" class="toast" role="status" hidden>
+  <span>Hay una versión nueva del timer.</span>
+  <button id="toast-reload" type="button">Actualizar</button>
+</div>
+
+<script src="js/platform.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/spatial-nav.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
