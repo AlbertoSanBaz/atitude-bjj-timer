@@ -81,7 +81,13 @@ class MainActivity : ComponentActivity() {
         webView.loadUrl(START_URL)
     }
 
-    /** Teclas multimedia del mando: ▶❚❚ pausa/continúa, ⏭ salta fase, ⏮ reinicia. */
+    /**
+     * Teclas multimedia del mando: ▶❚❚ pausa/continúa, ⏭ salta fase, ⏮ reinicia.
+     * Se capturan en dispatchKeyEvent (antes que la WebView) para que la web no las reciba
+     * también por su keydown y el comando no se ejecute dos veces.
+     * RestrictedApi: falso positivo, androidx.core redeclara este método público de Activity.
+     */
+    @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val command = when (event.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,

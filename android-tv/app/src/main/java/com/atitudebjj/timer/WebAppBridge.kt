@@ -1,7 +1,7 @@
 package com.atitudebjj.timer
 
-import android.net.Uri
 import android.webkit.JavascriptInterface
+import androidx.core.net.toUri
 
 /**
  * Puente expuesto a la web como `window.AtitudeTV` (ver web/js/platform.js).
@@ -19,7 +19,7 @@ class WebAppBridge(private val activity: MainActivity) {
 
     @JavascriptInterface
     fun openUrl(url: String) {
-        val uri = Uri.parse(url)
+        val uri = url.toUri()
         // solo enlaces web: nada de esquemas raros desde la página
         if (uri.scheme == "https" || uri.scheme == "http") {
             activity.runOnUiThread { activity.openExternal(uri) }

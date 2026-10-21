@@ -110,8 +110,9 @@ python3 -m http.server 8080 --directory web
 python3 tools/generate_assets.py
 
 # Android
-cd android-tv && ./gradlew assembleDebug     # o abrir android-tv/ en Android Studio
-adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/debug/app-debug.apk
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
+cd android-tv && ./gradlew assembleDebug assembleRelease lintDebug
+adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/release/app-release.apk
 ```
 
 **Pruebas usadas hasta ahora** (Playwright headless):
@@ -134,8 +135,11 @@ adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/debug/app-debug.a
 ## Estado y pendientes
 
 - ✅ PWA funcionando sin conexión y probada en navegador (escritorio, móvil y modo TV).
-- ⚠️ **El proyecto Android no se ha compilado nunca.** El entorno donde se creó no tenía acceso a Google Maven ni a la SDK. La primera tarea es abrirlo en Android Studio y compilar, corrigiendo lo que falle.
-  - Versiones elegidas: AGP 8.13.0, Kotlin 2.2.20, Gradle 8.14.3, compileSdk/targetSdk 36, minSdk 24, androidx core-ktx 1.15.0, activity-ktx 1.9.3, webkit 1.12.1. Se pueden actualizar.
+- ✅ **El proyecto Android compila** (debug y release) y `lintDebug` pasa sin errores. Aún no se ha ejecutado en ningún dispositivo ni emulador.
+  - Entorno del Mac (sin Android Studio): OpenJDK 21 de Homebrew (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`), `brew --cask android-commandlinetools` y SDK en `~/Library/Android/sdk` (platform-tools, platforms;android-36, build-tools 35 y 36). `android-tv/local.properties` apunta ahí (no se sube).
+  - Release: R8 conserva los métodos del puente con `@JavascriptInterface` (comprobado con dexdump). Firmado con la clave debug.
+  - `dispatchKeyEvent` lleva `@SuppressLint("RestrictedApi")`: falso positivo de androidx.core. No cambiarlo a `onKeyDown`, o las teclas multimedia llegarían también al keydown de la web y se ejecutarían dos veces.
+  - Versiones: AGP 8.13.0, Kotlin 2.2.20, Gradle 8.14.3, compileSdk/targetSdk 36, minSdk 24, androidx core-ktx 1.15.0, activity-ktx 1.9.3, webkit 1.12.1. Lint avisa de versiones nuevas (AGP 9 es un salto mayor: integra Kotlin y cambia el DSL).
 - ⏳ **Probar en la TV real del gimnasio:**
   - Versión del WebView.
   - Volumen de campana y claqueta.
