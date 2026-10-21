@@ -5,6 +5,8 @@
    - Layout del timer pensado para 16:9: ronda a la izquierda, reloj enorme a la derecha. */
 
 html.tv { --overscan-x: 5vw; --overscan-y: 5vh; }
+/* al desplazarse hasta el elemento enfocado, que no quede en la franja que recorta la tele */
+html.tv { scroll-padding: var(--overscan-y) 0; }
 
 /* ---------- foco visible ---------- */
 html.tv :focus { outline: none; }

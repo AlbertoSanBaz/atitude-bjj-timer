@@ -310,7 +310,7 @@
     Platform.keepAwake(false);
     exitFullscreen();
     renderSetup();
-    if (Nav.enabled()) els.start.focus({ preventScroll: true });
+    if (Nav.enabled()) Nav.focus(els.start);
   }
 
   function togglePlay() {
@@ -436,5 +436,6 @@
   bindSetup();
   bindRun();
   renderSetup();
-  if (Nav.enabled()) els.start.focus({ preventScroll: true });
+  // en TV el foco arranca en Empezar y se desplaza hasta él: con el mando se ve qué hará OK
+  if (Nav.enabled()) Nav.focus(els.start);
 })();

@@ -117,5 +117,5 @@
     }
   }, true);
 
-  window.BJJNav = { focusDefault: focusDefault, enabled: enabled };
+  window.BJJNav = { focusDefault: focusDefault, focus: focusEl, enabled: enabled };
 })();

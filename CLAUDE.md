@@ -135,7 +135,10 @@ adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/release/app-relea
 ## Estado y pendientes
 
 - ✅ PWA funcionando sin conexión y probada en navegador (escritorio, móvil y modo TV).
-- ✅ **El proyecto Android compila** (debug y release) y `lintDebug` pasa sin errores. Aún no se ha ejecutado en ningún dispositivo ni emulador.
+- ✅ **El proyecto Android compila** (debug y release) y `lintDebug` pasa sin errores.
+- ✅ **Probado en emulador** Google TV Android 12 (API 31, WebView 91, 1080p → viewport 960×540): puente, `html.native.tv`, mando (flechas/OK), ▶❚❚ ⏭ ⏮ sin dobles disparos, Atrás (pausa → ajustes → salir), `FLAG_KEEP_SCREEN_ON` y audio (AAudio, `USAGE_MEDIA`: en la tele manda el volumen multimedia).
+  - AVD `AtitudeTV_API31`: `~/Library/Android/sdk/emulator/emulator -avd AtitudeTV_API31`
+  - Inspeccionar la WebView (solo APK debug): `adb forward tcp:9222 localabstract:webview_devtools_remote_$(adb shell pidof com.atitudebjj.timer)` y abrir `chrome://inspect`.
   - Entorno del Mac (sin Android Studio): OpenJDK 21 de Homebrew (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`), `brew --cask android-commandlinetools` y SDK en `~/Library/Android/sdk` (platform-tools, platforms;android-36, build-tools 35 y 36). `android-tv/local.properties` apunta ahí (no se sube).
   - Release: R8 conserva los métodos del puente con `@JavascriptInterface` (comprobado con dexdump). Firmado con la clave debug.
   - `dispatchKeyEvent` lleva `@SuppressLint("RestrictedApi")`: falso positivo de androidx.core. No cambiarlo a `onKeyDown`, o las teclas multimedia llegarían también al keydown de la web y se ejecutarían dos veces.

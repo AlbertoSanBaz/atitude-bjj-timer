@@ -2,7 +2,7 @@
    Al cambiar cualquier archivo de la app, sube CACHE_VERSION para que los dispositivos se actualicen. */
 "use strict";
 
-var CACHE_VERSION = "atitude-timer-v1.0.1";
+var CACHE_VERSION = "atitude-timer-v1.0.2";
 
 var PRECACHE = [
   "./",
