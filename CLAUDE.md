@@ -53,6 +53,7 @@ android-tv/          ← proyecto Android Studio (Gradle KTS + version catalog)
     TimerWebViewClient.kt  ← WebViewAssetLoader + bloquea la navegación externa
 branding/logo.png    ← logo original (356 px, baja resolución: sustituir si llega uno mejor)
 tools/generate_assets.py ← genera iconos PWA, mipmaps, banner TV 320x180 y web/img/logo.webp
+tools/test_web.py        ← pruebas de la PWA con Playwright (ver «Comandos»)
 ```
 
 ## Convenciones del código web
@@ -115,13 +116,19 @@ cd android-tv && ./gradlew assembleDebug assembleRelease lintDebug
 adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/release/app-release.apk
 ```
 
-**Pruebas usadas hasta ahora** (Playwright headless):
+**Pruebas de la PWA:** `tools/test_web.py` (Playwright headless, 49 pruebas). Ejecutarlas **después de cualquier cambio en `web/`**:
 
-- Cargar con todas las peticiones externas bloqueadas.
-- Comprobar `document.fonts`.
-- Comprobar el control del SW y recargar con `context.set_offline(True)`.
-- `?tv=1` a 960x540, que equivale a 1080p en una TV xhdpi.
-- Simular el puente con `add_init_script` que define `window.AtitudeTV`.
+```bash
+pip install playwright        # usa Google Chrome si está; si no: python3 -m playwright install chromium
+python3 tools/test_web.py [--capturas DIR]
+```
+
+- Levanta su propio servidor en un puerto libre: no hace falta arrancar nada antes.
+- Usa reloj simulado (`page.clock`), así que los rounds pasan al instante.
+- Lee `CACHE_VERSION` y `PRECACHE` de `sw.js`: no hay que tocarlo al añadir archivos.
+- Cubre carga sin red externa, fuentes, presets, motor del timer, puente nativo simulado, modo TV (`?tv=1` a 960x540 = 1080p xhdpi), móvil, SW offline y flujo de actualización.
+- Incluye regresiones de dos fallos ya corregidos: la recarga doble en la primera visita y el foco de Empezar fuera de pantalla en TV.
+- En esta Mac, Playwright está instalado en un venv temporal. Si no está, crear uno: `python3 -m venv .venv && .venv/bin/pip install playwright` (`.venv/` está en `.gitignore`).
 
 ## Reglas al hacer cambios
 
@@ -136,7 +143,7 @@ adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/release/app-relea
 
 ### Hecho
 
-- ✅ **PWA** funcionando sin conexión y probada en navegador (escritorio, móvil y modo TV): 44 pruebas Playwright.
+- ✅ **PWA** funcionando sin conexión y probada en navegador (escritorio, móvil y modo TV): 49 pruebas en `tools/test_web.py`.
 - ✅ **Repositorio público:** https://github.com/AlbertoSanBaz/atitude-bjj-timer (rama `main`).
 - ✅ **PWA publicada en GitHub Pages:** https://albertosanbaz.github.io/atitude-bjj-timer/
   - `.github/workflows/pages.yml` despliega `web/` en cada push a `main` que toque `web/`.

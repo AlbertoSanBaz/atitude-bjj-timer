@@ -44,7 +44,8 @@ atitude-timer/
 │  ├─ app/build.gradle.kts      ← incluye la tarea syncWebAssets (web/ → assets/www)
 │  └─ gradle/libs.versions.toml ← versiones de dependencias
 ├─ branding/                    ← originales: logo y foto del equipo
-└─ tools/generate_assets.py     ← regenera iconos, banner y logo desde branding/logo.png
+├─ tools/generate_assets.py     ← regenera iconos, banner y logo desde branding/logo.png
+└─ tools/test_web.py            ← pruebas automáticas de la PWA (Playwright)
 ```
 
 ---
@@ -60,6 +61,15 @@ python3 -m http.server 8080 --directory web
 
 - El service worker solo se activa en `https://` o en `localhost`.
 - **Modo TV en el navegador:** abre `http://localhost:8080/?tv=1` y usa las flechas del teclado y Enter.
+
+### Pruebas automáticas
+
+```bash
+pip install playwright
+python3 tools/test_web.py            # añade --capturas DIR para guardar capturas
+```
+
+Prueban la app en escritorio, móvil, modo TV y sin conexión, con el puente nativo simulado. Usa Google Chrome si está instalado; si no, ejecuta antes `python3 -m playwright install chromium`.
 
 ### Publicar
 
