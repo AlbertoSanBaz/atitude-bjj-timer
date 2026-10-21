@@ -63,7 +63,9 @@ python3 -m http.server 8080 --directory web
 
 ### Publicar
 
-Sube **el contenido de `web/`** a cualquier hosting estático con HTTPS: GitHub Pages, Netlify, Cloudflare Pages o Vercel. No hay que compilar nada.
+La PWA está publicada en **GitHub Pages**: <https://albertosanbaz.github.io/atitude-bjj-timer/>
+
+El workflow `.github/workflows/pages.yml` publica la carpeta `web/` automáticamente cada vez que se sube a `main` un cambio dentro de `web/`. También se puede lanzar a mano desde la pestaña *Actions* del repositorio. No hay que compilar nada.
 
 La primera visita guarda todo en caché. A partir de ahí funciona sin conexión y se puede instalar:
 
@@ -76,7 +78,7 @@ La primera visita guarda todo en caché. A partir de ahí funciona sin conexión
 1. Cambia lo que necesites en `web/`.
 2. **Sube `CACHE_VERSION` en `web/sw.js`**, por ejemplo `atitude-timer-v1.0.1`. Si no, los dispositivos seguirán usando la versión que tienen en caché.
 3. Si añades archivos nuevos, inclúyelos en la lista `PRECACHE` de `sw.js`.
-4. Publica. Quien tenga la app abierta verá el aviso «Hay una versión nueva del timer» con el botón **Actualizar**.
+4. Haz commit y push a `main`: GitHub Pages se actualiza en un minuto. Quien tenga la app abierta verá el aviso «Hay una versión nueva del timer» con el botón **Actualizar**.
 
 ---
 

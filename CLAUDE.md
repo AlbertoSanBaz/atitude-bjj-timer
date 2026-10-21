@@ -142,7 +142,10 @@ adb connect IP_TV:5555 && adb install -r app/build/outputs/apk/debug/app-debug.a
   - Navegación con el mando.
   - Teclas multimedia.
   - Que la pantalla no se apague.
-- ⏳ Elegir hosting HTTPS para la PWA (GitHub Pages, Netlify o Cloudflare Pages) y publicarla.
+- ✅ Repositorio público: https://github.com/AlbertoSanBaz/atitude-bjj-timer (rama `main`).
+- ✅ PWA publicada en GitHub Pages: https://albertosanbaz.github.io/atitude-bjj-timer/
+  - `.github/workflows/pages.yml` despliega `web/` en cada push a `main` que toque `web/`.
+  - Se sirve en un subdirectorio: **todas las rutas deben ser relativas** (nada de `/css/...`).
 - ⏳ Conseguir el logo original en alta resolución → `branding/logo.png` → `tools/generate_assets.py`.
 - ⏳ Si se publica en Google Play: firma propia (ahora el release usa la clave debug), App Bundle y checklist de calidad de TV.
 - **Artefacto antiguo:** existe una versión anterior publicada como artefacto en claude.ai («Atitude BJJ Timer»). **No está sincronizada** con `web/`: la fuente de verdad es este repositorio.
